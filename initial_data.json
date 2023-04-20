@@ -1,0 +1,46 @@
+[
+  {
+    "model": "core.check",
+    "pk": 1,
+    "fields": {
+      "printer_id": 2,
+      "check_type": "CLIENT",
+      "order": {
+        "order_id": 1,
+        "point_id": 1
+      }
+    }
+  },
+  {
+    "model": "core.check",
+    "pk": 2,
+    "fields": {
+      "printer_id": 1,
+      "check_type": "KITCHEN",
+      "order": {
+        "order_id": 1,
+        "point_id": 1
+      }
+    }
+  },
+  {
+    "model": "core.printer",
+    "pk": 1,
+    "fields": {
+      "name": "super printer",
+      "api_key": "29473c06-c2c7-434a-a40e-fd9af59f32e0",
+      "check_type": "KITCHEN",
+      "point_id": 1
+    }
+  },
+  {
+    "model": "core.printer",
+    "pk": 2,
+    "fields": {
+      "name": "super printer 2",
+      "api_key": "5b93e076-5e7f-4cfc-ab8f-e30531742f83",
+      "check_type": "CLIENT",
+      "point_id": 1
+    }
+  }
+]
