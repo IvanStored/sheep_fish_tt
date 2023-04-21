@@ -51,8 +51,6 @@ class CheckViewSet(viewsets.ModelViewSet):
 
             checks.append(check)
 
-            render_checks.delay(check.id)
-
         return Response({"checks": CheckSchema(checks, many=True).data})
 
     @action(
@@ -62,21 +60,20 @@ class CheckViewSet(viewsets.ModelViewSet):
         url_name="print",
     )
     def send_checks_to_print(self, request: Request, api_key: str) -> Response:
-        rendered_checks = Check.objects.filter(
-            printer_id__api_key=api_key, status=Check.RENDERED
+        new_checks = Check.objects.filter(
+            printer_id__api_key=api_key, status=Check.NEW
         )
 
-        if not rendered_checks:
+        if not new_checks:
             return Response(
                 {"message": f"There are no checks available"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        for check in rendered_checks:
-            check.status = Check.PRINTED
-            check.save()
+        for check in new_checks:
+            render_checks.delay(check.id)
 
-        serializer = self.get_serializer(rendered_checks, many=True)
+        serializer = self.get_serializer(new_checks, many=True)
         return Response(serializer.data)
 
 
@@ -90,7 +87,7 @@ def download_check(request: Request, check_id: int) -> Response | FileResponse:
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    if check.status != Check.PRINTED:
+    if check.status != Check.RENDERED:
         return Response(
             {"message": f"Check {check_id} is not available for download."},
             status=status.HTTP_400_BAD_REQUEST,
@@ -106,5 +103,6 @@ def download_check(request: Request, check_id: int) -> Response | FileResponse:
         )
     response = FileResponse(open(filepath, "rb"))
     response["Content-Disposition"] = f"attachment; filename={filepath.name}"
-
+    check.status = Check.PRINTED
+    check.save()
     return response

@@ -5,6 +5,7 @@ source venv/bin/activate (Linux) or venv\Scripts\activate (Windows)
 pip install -r requirements.txt
 docker-compose up
 python manage.py migrate
+python manage.py loaddata initial_data.json
 python manage.py runserver
 celery -A sheepfish_tt worker -l INFO
 ```
